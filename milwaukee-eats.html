@@ -500,7 +500,7 @@
   <div class="config-inner">
     <div class="config-group" style="flex:2; min-width:260px;">
       <label>Backend URL</label>
-      <input type="text" id="backend-url" value="http://localhost:3001" placeholder="http://localhost:3001" autocomplete="off">
+      <input type="text" id="backend-url" value="mke-eats-backend-production.up.railway.app" placeholder="mke-eats-backend-production.up.railway.app" autocomplete="off">
     </div>
     <div class="config-group" style="max-width:160px; min-width:120px;">
       <label>Category Filter</label>
@@ -539,7 +539,7 @@
       <ol>
         <li>Copy <code>.env.example</code> → <code>.env</code> and paste in your Yelp + Anthropic API keys</li>
         <li>Run <code>npm install</code> then <code>npm start</code> in the <code>mke-eats-backend/</code> folder</li>
-        <li>Make sure the Backend URL above says <strong>http://localhost:3001</strong>, then click <strong>Load Today's Digest</strong></li>
+        <li>Make sure the Backend URL above says <strong>mke-eats-backend-production.up.railway.app</strong>, then click <strong>Load Today's Digest</strong></li>
       </ol>
       <div style="margin-top:0.5rem; color: var(--muted);">
         Keys stay safely on your server — never exposed to the browser. The backend handles all Yelp + Anthropic calls.
@@ -594,7 +594,7 @@ function priceLabel(p) {
 
 // ─── Backend API helper ───────────────────────────
 function apiBase() {
-  return (document.getElementById('backend-url')?.value?.trim() || 'http://localhost:3001');
+  return (document.getElementById('backend-url')?.value?.trim() || 'mke-eats-backend-production.up.railway.app');
 }
 
 async function apiFetch(path, options = {}) {
