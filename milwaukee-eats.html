@@ -594,11 +594,12 @@ function priceLabel(p) {
 
 // ─── Backend API helper ───────────────────────────
 function apiBase() {
-  return ";
+  const input = document.getElementById('backend-url')?.value?.trim();
+  if (input) return input;
+  return window.location.origin;
 }
-
 async function apiFetch(path, options = {}) {
-  const url = `${path}`;
+  const url = `${apiBase()}${path}`;
   const res = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...options });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: res.statusText }));
