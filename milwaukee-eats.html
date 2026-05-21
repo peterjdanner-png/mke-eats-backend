@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MKE Eats — Milwaukee's Daily Dining Digest</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f0d0a;
+    --cream: #f5f0e8;
+    --warm: #e8dfc8;
+    --rust: #c44b2b;
+    --gold: #d4a853;
+    --sage: #5a7a5c;
+    --muted: #7a6f60;
+    --card: #fffdf8;
+    --border: #ddd5c0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* MASTHEAD */
+  .masthead {
+    background: var(--ink);
+    color: var(--cream);
+    padding: 0 2rem;
+    border-bottom: 4px solid var(--rust);
+  }
+  .masthead-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.2rem 0;
+    gap: 1rem;
+  }
+  .masthead-left { flex: 1; }
+  .masthead-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.15rem;
+  }
+  .masthead-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.4rem;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .masthead-title span { color: var(--rust); }
+  .masthead-tagline {
+    font-size: 0.75rem;
+    color: #9a9080;
+    margin-top: 0.2rem;
+    font-weight: 300;
+  }
+  .masthead-date {
+    text-align: right;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    color: #9a9080;
+    line-height: 1.6;
+  }
+  .masthead-date strong {
+    display: block;
+    font-size: 1.5rem;
+    font-family: 'Playfair Display', serif;
+    color: var(--cream);
+    font-weight: 700;
+  }
+
+  /* CONFIG PANEL */
+  .config-bar {
+    background: var(--warm);
+    border-bottom: 1px solid var(--border);
+    padding: 0.8rem 2rem;
+  }
+  .config-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-end;
+    flex-wrap: wrap;
+  }
+  .config-group { display: flex; flex-direction: column; gap: 0.25rem; flex: 1; min-width: 200px; }
+  .config-group label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .config-group input, .config-group select {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.5rem 0.75rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .config-group input:focus, .config-group select:focus { border-color: var(--rust); }
+  .config-group input[type="password"] { font-family: 'DM Mono', monospace; letter-spacing: 0.08em; }
+
+  .fetch-btn {
+    background: var(--rust);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.55rem 1.5rem;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    white-space: nowrap;
+    align-self: flex-end;
+    height: 36px;
+  }
+  .fetch-btn:hover { background: #a83a20; }
+  .fetch-btn:active { transform: scale(0.98); }
+  .fetch-btn:disabled { background: #b0a090; cursor: not-allowed; }
+
+  /* API KEY NOTICE */
+  .api-notice {
+    background: #fff8e8;
+    border: 1px solid var(--gold);
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    max-width: 1100px;
+    margin: 1.5rem auto;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  .api-notice-icon { font-size: 1.3rem; flex-shrink: 0; }
+  .api-notice a { color: var(--rust); }
+  .api-notice ol { margin-left: 1.2rem; margin-top: 0.4rem; }
+  .api-notice li { margin-bottom: 0.2rem; }
+
+  /* MAIN LAYOUT */
+  .main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1.5rem 2rem 4rem;
+  }
+
+  /* STATUS BAR */
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .status-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+  }
+  .status-dot {
+    display: inline-block;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #ccc;
+    margin-right: 0.4rem;
+    vertical-align: middle;
+  }
+  .status-dot.live { background: var(--sage); animation: pulse 2s infinite; }
+  .status-dot.loading { background: var(--gold); animation: pulse 1s infinite; }
+  .status-dot.error { background: var(--rust); }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .filter-pills { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+  .pill {
+    padding: 0.2rem 0.7rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--muted);
+    transition: all 0.15s;
+  }
+  .pill.active { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+  .pill:hover:not(.active) { border-color: var(--rust); color: var(--rust); }
+
+  /* LOADING SKELETON */
+  .skeleton-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.25rem;
+  }
+  .skeleton-card {
+    background: var(--card);
+    border-radius: 8px;
+    padding: 1.25rem;
+    border: 1px solid var(--border);
+    animation: shimmer 1.5s infinite;
+  }
+  .skel { background: var(--warm); border-radius: 3px; margin-bottom: 0.5rem; }
+  @keyframes shimmer {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
+  /* RESTAURANT GRID */
+  .restaurant-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.25rem;
+  }
+
+  /* RESTAURANT CARD */
+  .restaurant-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    animation: fadeUp 0.4s ease both;
+  }
+  .restaurant-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card-image {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    background: var(--warm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .card-image img { width: 100%; height: 100%; object-fit: cover; }
+
+  .card-body { padding: 1rem 1.1rem; flex: 1; display: flex; flex-direction: column; }
+
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.5rem; }
+
+  .card-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--ink);
+  }
+  .card-name a { color: inherit; text-decoration: none; }
+  .card-name a:hover { color: var(--rust); }
+
+  .card-rating {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    flex-shrink: 0;
+  }
+  .stars {
+    color: var(--gold);
+    font-size: 0.75rem;
+    letter-spacing: -0.05em;
+  }
+  .rating-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+  }
+
+  .card-meta {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+  }
+  .meta-tag {
+    font-size: 0.65rem;
+    font-family: 'DM Mono', monospace;
+    padding: 0.1rem 0.5rem;
+    border-radius: 3px;
+    background: var(--warm);
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .meta-tag.price { color: var(--sage); }
+  .meta-tag.open { color: var(--sage); background: #eaf2ea; }
+  .meta-tag.closed { color: var(--rust); background: #faeaea; }
+
+  .card-address {
+    font-size: 0.73rem;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  /* SPECIALS SECTION */
+  .specials-section {
+    background: linear-gradient(135deg, #fff8e8, #fff3d4);
+    border: 1px solid #e8d090;
+    border-radius: 6px;
+    padding: 0.7rem 0.85rem;
+    margin-bottom: 0.75rem;
+  }
+  .specials-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--gold);
+    margin-bottom: 0.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+  .specials-text {
+    font-size: 0.78rem;
+    color: #5a4a20;
+    line-height: 1.5;
+    font-style: italic;
+  }
+  .specials-loading {
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .spin {
+    display: inline-block;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* REVIEWS SECTION */
+  .reviews-section { flex: 1; }
+  .reviews-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 0.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .review-item {
+    border-top: 1px solid var(--border);
+    padding: 0.5rem 0;
+  }
+  .review-item:first-of-type { border-top: none; }
+  .review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.2rem;
+  }
+  .reviewer-name { font-size: 0.7rem; font-weight: 500; color: var(--ink); }
+  .review-stars { font-size: 0.65rem; color: var(--gold); }
+  .review-text {
+    font-size: 0.74rem;
+    color: var(--muted);
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-footer {
+    padding: 0.6rem 1.1rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .review-count { font-size: 0.68rem; color: var(--muted); font-family: 'DM Mono', monospace; }
+  .yelp-link {
+    font-size: 0.68rem;
+    color: var(--rust);
+    text-decoration: none;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+  }
+  .yelp-link:hover { text-decoration: underline; }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 5rem 2rem;
+    color: var(--muted);
+  }
+  .empty-state .big-icon { font-size: 4rem; margin-bottom: 1rem; opacity: 0.4; }
+  .empty-state h2 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--ink); margin-bottom: 0.5rem; }
+  .empty-state p { font-size: 0.85rem; max-width: 380px; margin: 0 auto; line-height: 1.6; }
+
+  /* ERROR STATE */
+  .error-box {
+    background: #faeaea;
+    border: 1px solid #e0a0a0;
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    font-size: 0.82rem;
+    color: #7a2020;
+    margin-bottom: 1.5rem;
+  }
+
+  /* DEMO BANNER */
+  .demo-banner {
+    background: var(--sage);
+    color: white;
+    text-align: center;
+    padding: 0.5rem;
+    font-size: 0.72rem;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.06em;
+  }
+
+  /* DIVIDER */
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 2rem 0 1.25rem;
+  }
+  .section-divider span {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    white-space: nowrap;
+    color: var(--ink);
+  }
+  .divider-line { flex: 1; height: 1px; background: var(--border); }
+
+  @media (max-width: 600px) {
+    .masthead-title { font-size: 1.7rem; }
+    .config-inner { flex-direction: column; }
+    .main { padding: 1rem 1rem 3rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="demo-banner">🚀 BACKEND-CONNECTED — Start the Node.js server first, then click "Load Today's Digest" · API keys live in your .env file</div>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="masthead-left">
+      <div class="masthead-eyebrow">Milwaukee County, Wisconsin</div>
+      <div class="masthead-title">MKE <span>Eats</span></div>
+      <div class="masthead-tagline">Your daily digest of Milwaukee's best restaurants, reviews & specials</div>
+    </div>
+    <div class="masthead-date">
+      <strong id="day-display">—</strong>
+      <span id="date-display">Loading date...</span>
+    </div>
+  </div>
+</header>
+
+<div class="config-bar">
+  <div class="config-inner">
+    <div class="config-group" style="flex:2; min-width:260px;">
+      <label>Backend URL</label>
+      <input type="text" id="backend-url" value="http://localhost:3001" placeholder="http://localhost:3001" autocomplete="off">
+    </div>
+    <div class="config-group" style="max-width:160px; min-width:120px;">
+      <label>Category Filter</label>
+      <select id="category-filter">
+        <option value="restaurants">All Restaurants</option>
+        <option value="pizza">Pizza</option>
+        <option value="burgers">Burgers</option>
+        <option value="mexican">Mexican</option>
+        <option value="seafood">Seafood</option>
+        <option value="italian">Italian</option>
+        <option value="bars">Bars</option>
+        <option value="breakfast_brunch">Breakfast & Brunch</option>
+      </select>
+    </div>
+    <div class="config-group" style="max-width:130px; min-width:100px;">
+      <label>Sort By</label>
+      <select id="sort-by">
+        <option value="rating">Top Rated</option>
+        <option value="best_match">Best Match</option>
+        <option value="review_count">Most Reviewed</option>
+        <option value="distance">Nearest</option>
+      </select>
+    </div>
+    <button class="fetch-btn" id="fetch-btn" onclick="fetchRestaurants()">
+      ↻ Load Today's Digest
+    </button>
+  </div>
+</div>
+
+<div class="main">
+  <!-- API Key Guidance -->
+  <div class="api-notice" id="key-notice">
+    <div class="api-notice-icon">⚡</div>
+    <div>
+      <strong>Quick Start — 3 steps to go live:</strong>
+      <ol>
+        <li>Copy <code>.env.example</code> → <code>.env</code> and paste in your Yelp + Anthropic API keys</li>
+        <li>Run <code>npm install</code> then <code>npm start</code> in the <code>mke-eats-backend/</code> folder</li>
+        <li>Make sure the Backend URL above says <strong>http://localhost:3001</strong>, then click <strong>Load Today's Digest</strong></li>
+      </ol>
+      <div style="margin-top:0.5rem; color: var(--muted);">
+        Keys stay safely on your server — never exposed to the browser. The backend handles all Yelp + Anthropic calls.
+      </div>
+    </div>
+  </div>
+
+  <div id="error-box" class="error-box" style="display:none;"></div>
+
+  <div class="status-bar" id="status-bar" style="display:none;">
+    <div class="status-text">
+      <span class="status-dot" id="status-dot"></span>
+      <span id="status-text">Ready</span>
+    </div>
+    <div class="filter-pills" id="filter-pills"></div>
+  </div>
+
+  <div id="content">
+    <div class="empty-state">
+      <div class="big-icon">🍴</div>
+      <h2>Milwaukee's Best, Daily</h2>
+      <p>Enter your Yelp API key above and click "Load Today's Digest" to discover the best restaurants in Milwaukee County right now.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── Date display ────────────────────────────────
+const now = new Date();
+const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+document.getElementById('day-display').textContent = days[now.getDay()];
+document.getElementById('date-display').textContent = `${months[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+
+// ─── State ───────────────────────────────────────
+let allRestaurants = [];
+let activeFilter = 'all';
+
+// ─── Stars helper ────────────────────────────────
+function renderStars(rating) {
+  const full = Math.floor(rating);
+  const half = rating % 1 >= 0.5 ? 1 : 0;
+  const empty = 5 - full - half;
+  return '★'.repeat(full) + (half ? '½' : '') + '☆'.repeat(empty);
+}
+
+// ─── Price helper ────────────────────────────────
+function priceLabel(p) {
+  const map = {1:'$', 2:'$$', 3:'$$$', 4:'$$$$'};
+  return map[p] || '';
+}
+
+// ─── Backend API helper ───────────────────────────
+function apiBase() {
+  return (document.getElementById('backend-url')?.value?.trim() || 'http://localhost:3001');
+}
+
+async function apiFetch(path, options = {}) {
+  const url = `${apiBase()}${path}`;
+  const res = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...options });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: res.statusText }));
+    throw new Error(err.error || `HTTP ${res.status}`);
+  }
+  return res.json();
+}
+
+// ─── Main fetch ──────────────────────────────────
+async function fetchRestaurants() {
+  const category = document.getElementById('category-filter').value;
+  const sortBy = document.getElementById('sort-by').value;
+
+  document.getElementById('key-notice').style.display = 'none';
+  document.getElementById('error-box').style.display = 'none';
+  document.getElementById('status-bar').style.display = 'flex';
+  setStatus('loading', 'Fetching from Yelp, Google & TripAdvisor...');
+  document.getElementById('fetch-btn').disabled = true;
+  showSkeletons(9);
+
+  try {
+    // Use the aggregated endpoint — merges all configured sources
+    const data = await apiFetch(`/api/aggregate/restaurants?category=${category}&sort_by=${sortBy}&limit=20`);
+
+    if (!data.businesses || data.businesses.length === 0) {
+      showError('No restaurants found. Make sure your backend is running and at least one API key is set in .env');
+      return;
+    }
+
+    allRestaurants = data.businesses;
+    const cacheNote = data.fromCache ? ' · (cached)' : '';
+    const sources = data.enabledSources || [];
+    const sourceLabel = sources.length ? ` · Sources: ${sources.join(', ')}` : '';
+    setStatus('live', `${allRestaurants.length} restaurants from ${sources.length} source(s) · ${new Date().toLocaleTimeString()}${cacheNote}${sourceLabel}`);
+
+    // Show source stats if any sources errored
+    if (data.sourceStats) {
+      const errors = Object.entries(data.sourceStats).filter(([,v]) => v.status === 'error');
+      if (errors.length) {
+        const errNames = errors.map(([k]) => k).join(', ');
+        showError(`Note: ${errNames} couldn't be reached (check those API keys). Showing results from other sources.`);
+        document.getElementById('error-box').style.background = '#fff8e8';
+        document.getElementById('error-box').style.borderColor = '#e8d090';
+        document.getElementById('error-box').style.color = '#5a4a20';
+      }
+    }
+
+    buildFilterPills(allRestaurants);
+    renderRestaurants(allRestaurants);
+
+    // Fetch reviews for all restaurants
+    fetchAggregatedReviews(allRestaurants);
+
+  } catch (err) {
+    showError(`Cannot reach backend at ${apiBase()}. Make sure the server is running: cd mke-eats-backend && npm start\n\nError: ${err.message}`);
+    setStatus('error', 'Backend offline');
+  } finally {
+    document.getElementById('fetch-btn').disabled = false;
+  }
+}
+
+// ─── Aggregated reviews + specials ───────────────
+async function fetchAggregatedReviews(restaurants) {
+  const specialsPayload = [];
+
+  for (const biz of restaurants) {
+    try {
+      const { sourceIds, name } = biz;
+      const params = new URLSearchParams();
+      if (sourceIds?.yelp) params.set('yelpId', sourceIds.yelp);
+      if (sourceIds?.google) params.set('googleId', sourceIds.google);
+      if (sourceIds?.tripadvisor) params.set('tripadvisorId', sourceIds.tripadvisor);
+
+      // Fall back to Yelp batch if no sourceIds (single-source result)
+      let reviews = [];
+      if (params.toString()) {
+        const encodedName = encodeURIComponent(name);
+        const data = await apiFetch(`/api/aggregate/restaurants/${encodedName}/reviews?${params}`);
+        reviews = data.reviews || [];
+      } else if (biz.source === 'yelp' && biz.id) {
+        const data = await apiFetch(`/api/restaurants/${biz.id}/reviews`);
+        reviews = data.reviews || [];
+      }
+
+      if (reviews.length) {
+        updateCardReviews(biz.id, reviews);
+        specialsPayload.push({ businessId: biz.id, businessName: biz.name, reviews });
+      }
+
+      await new Promise(r => setTimeout(r, 100)); // gentle pacing
+    } catch(e) {
+      // Non-critical — skip silently
+    }
+  }
+
+  if (specialsPayload.length > 0) {
+    extractBatchSpecials(specialsPayload);
+  }
+}
+
+// ─── AI specials via backend ──────────────────────
+async function extractBatchSpecials(restaurants) {
+  // Process in chunks of 10 (backend limit)
+  for (let i = 0; i < restaurants.length; i += 10) {
+    const chunk = restaurants.slice(i, i + 10);
+    try {
+      const data = await apiFetch('/api/specials/batch', {
+        method: 'POST',
+        body: JSON.stringify({ restaurants: chunk }),
+      });
+      for (const { businessId } of chunk) {
+        const result = data.results?.[businessId];
+        const el = document.getElementById(`specials-${businessId}`);
+        if (!el) continue;
+        if (result?.special) {
+          el.innerHTML = `<div class="specials-label">✦ Today's Highlights (AI-extracted)</div><div class="specials-text">${result.special}</div>`;
+          el.style.display = '';
+        } else {
+          el.style.display = 'none';
+        }
+      }
+    } catch(e) {
+      // Specials are non-critical — hide all pending ones
+      chunk.forEach(({ businessId }) => {
+        const el = document.getElementById(`specials-${businessId}`);
+        if (el) el.style.display = 'none';
+      });
+    }
+  }
+}
+
+// ─── Render ───────────────────────────────────────
+function renderRestaurants(restaurants) {
+  const content = document.getElementById('content');
+  if (restaurants.length === 0) {
+    content.innerHTML = `<div class="empty-state"><div class="big-icon">🔍</div><h2>No results</h2><p>Try a different filter.</p></div>`;
+    return;
+  }
+
+  content.innerHTML = `<div class="restaurant-grid" id="restaurant-grid">${restaurants.map((biz, i) => renderCard(biz, i)).join('')}</div>`;
+}
+
+function renderCard(biz, index) {
+  const cats = biz.categories?.map(c => `<span class="meta-tag">${c.title}</span>`).join('') || '';
+  const price = biz.price_display || (biz.price ? `${'$'.repeat(biz.price)}` : '');
+  const priceTag = price ? `<span class="meta-tag price">${price}</span>` : '';
+  const isOpen = biz.is_open ?? biz.hours?.[0]?.is_open_now;
+  const openTag = isOpen !== undefined ? `<span class="meta-tag ${isOpen ? 'open' : 'closed'}">${isOpen ? '● Open' : '● Closed'}</span>` : '';
+  const address = biz.location?.display_address?.join(', ') || '';
+  const imgSrc = biz.image_url || '';
+
+  // Combined rating + review count across all sources
+  const combinedRating = biz.combined_rating || biz.rating || 0;
+  const totalReviews = biz.combined_review_count || biz.review_count || 0;
+
+  // Source badges — show which platforms this restaurant appears on
+  const sourceIcons = { yelp: '🔴', google: '🔵', tripadvisor: '🟢' };
+  const sourceNames = { yelp: 'Yelp', google: 'Google', tripadvisor: 'TripAdvisor' };
+  const activeSources = biz.sources || [{ name: biz.source || 'yelp' }];
+  const sourceBadges = activeSources.map(s =>
+    `<span class="meta-tag" title="${sourceNames[s.name] || s.name}: ${s.rating || '?'}★ (${(s.review_count||0).toLocaleString()} reviews)">${sourceIcons[s.name] || '⚪'} ${sourceNames[s.name] || s.name}</span>`
+  ).join('');
+
+  return `
+  <div class="restaurant-card" style="animation-delay:${index * 0.05}s" id="card-${biz.id}">
+    <div class="card-image">
+      ${imgSrc ? `<img src="${imgSrc}" alt="${biz.name}" loading="lazy" onerror="this.parentNode.innerHTML='🍽️'">` : '🍽️'}
+    </div>
+    <div class="card-body">
+      <div class="card-header">
+        <div class="card-name"><a href="${biz.url}" target="_blank">${biz.name}</a></div>
+        <div class="card-rating">
+          <div class="stars">${renderStars(combinedRating)}</div>
+          <div class="rating-num">${combinedRating} / 5.0</div>
+        </div>
+      </div>
+      <div class="card-meta">${cats}${priceTag}${openTag}${sourceBadges}</div>
+      <div class="card-address">📍 ${address}</div>
+
+      <div id="specials-${biz.id}" class="specials-section" style="display:none"></div>
+
+      <div class="reviews-section">
+        <div class="reviews-label">
+          <span>Top Reviews</span>
+        </div>
+        <div id="reviews-${biz.id}">
+          <div class="specials-loading" style="padding:0.5rem 0"><span class="spin">⟳</span> Loading reviews...</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <span class="review-count">${totalReviews.toLocaleString()} total reviews</span>
+      <a class="yelp-link" href="${biz.url}" target="_blank">View listing →</a>
+    </div>
+  </div>`;
+}
+
+function updateCardReviews(bizId, reviews) {
+  const el = document.getElementById(`reviews-${bizId}`);
+  if (!el) return;
+  if (!reviews.length) {
+    el.innerHTML = '<div style="font-size:0.72rem;color:var(--muted);font-style:italic;">No reviews available.</div>';
+    return;
+  }
+  el.innerHTML = reviews.map(r => `
+    <div class="review-item">
+      <div class="review-header">
+        <span class="reviewer-name">${r.user?.name || 'Anonymous'} <span style="font-size:0.6rem;color:var(--muted);font-weight:400;">${r.source ? '· ' + r.source : ''}</span></span>
+        <span class="review-stars">${renderStars(r.rating)}</span>
+      </div>
+      <div class="review-text">${r.text || ''}</div>
+    </div>
+  `).join('');
+}
+
+// ─── Filter pills ─────────────────────────────────
+function buildFilterPills(restaurants) {
+  const catCounts = {};
+  restaurants.forEach(biz => {
+    biz.categories?.forEach(c => {
+      catCounts[c.title] = (catCounts[c.title] || 0) + 1;
+    });
+  });
+  const topCats = Object.entries(catCounts).sort((a,b) => b[1]-a[1]).slice(0,6).map(([k]) => k);
+
+  const pillsEl = document.getElementById('filter-pills');
+  pillsEl.innerHTML = `
+    <span class="pill active" onclick="filterByTag('all', this)">All (${restaurants.length})</span>
+    ${topCats.map(cat => `<span class="pill" onclick="filterByTag('${cat}', this)">${cat}</span>`).join('')}
+  `;
+}
+
+function filterByTag(tag, el) {
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  activeFilter = tag;
+  if (tag === 'all') {
+    renderRestaurants(allRestaurants);
+  } else {
+    const filtered = allRestaurants.filter(biz => biz.categories?.some(c => c.title === tag));
+    renderRestaurants(filtered);
+  }
+}
+
+// ─── Skeletons ────────────────────────────────────
+function showSkeletons(n) {
+  document.getElementById('content').innerHTML = `
+    <div class="skeleton-grid">
+      ${Array(n).fill(`
+        <div class="skeleton-card">
+          <div class="skel" style="height:140px;border-radius:6px;margin-bottom:1rem;"></div>
+          <div class="skel" style="height:18px;width:70%;"></div>
+          <div class="skel" style="height:12px;width:45%;"></div>
+          <div class="skel" style="height:12px;width:90%;margin-top:0.5rem;"></div>
+          <div class="skel" style="height:12px;width:80%;"></div>
+          <div class="skel" style="height:12px;width:60%;"></div>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ─── Status / Error helpers ───────────────────────
+function setStatus(type, text) {
+  const dot = document.getElementById('status-dot');
+  dot.className = `status-dot ${type}`;
+  document.getElementById('status-text').textContent = text;
+}
+
+function showError(msg) {
+  const el = document.getElementById('error-box');
+  el.textContent = '⚠ ' + msg;
+  el.style.display = 'block';
+  document.getElementById('content').innerHTML = `<div class="empty-state"><div class="big-icon">⚠️</div><h2>Something went wrong</h2><p>${msg}</p></div>`;
+}
+</script>
+</body>
+</html>
