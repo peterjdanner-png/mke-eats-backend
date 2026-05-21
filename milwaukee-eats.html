@@ -594,11 +594,11 @@ function priceLabel(p) {
 
 // ─── Backend API helper ───────────────────────────
 function apiBase() {
-  return (document.getElementById('backend-url')?.value?.trim() || 'mke-eats-backend-production.up.railway.app');
+  return ";
 }
 
 async function apiFetch(path, options = {}) {
-  const url = `${apiBase()}${path}`;
+  const url = `${path}`;
   const res = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...options });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: res.statusText }));
