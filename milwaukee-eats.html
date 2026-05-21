@@ -594,9 +594,8 @@ function priceLabel(p) {
 
 // ─── Backend API helper ───────────────────────────
 function apiBase() {
-  const input = document.getElementById('backend-url')?.value?.trim();
-  if (input) return input;
   return window.location.origin;
+}
 }
 async function apiFetch(path, options = {}) {
   const url = `${apiBase()}${path}`;
