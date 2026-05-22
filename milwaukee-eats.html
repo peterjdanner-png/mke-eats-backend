@@ -524,7 +524,7 @@
         <option value="distance">Nearest</option>
       </select>
     </div>
-    <button class="fetch-btn" id="fetch-btn" onclick="fetchRestaurants()">
+    <button class="fetch-btn" id="fetch-btn" id="fetch-btn">
       ↻ Load Today's Digest
     </button>
   </div>
@@ -593,7 +593,8 @@ function priceLabel(p) {
 }
 
 // ─── Backend API helper ───────────────────────────
-function apiBase() {
+document.getElementById('fetch-btn').addEventListener('click', fetchRestaurants);
+  function apiBase() {
   return window.location.origin;
 }
 }
