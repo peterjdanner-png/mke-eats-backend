@@ -597,7 +597,6 @@ document.getElementById('fetch-btn').addEventListener('click', fetchRestaurants)
   function apiBase() {
   return window.location.origin;
 }
-}
 async function apiFetch(path, options = {}) {
   const url = `${apiBase()}${path}`;
   const res = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...options });
